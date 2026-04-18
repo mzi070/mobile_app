@@ -1,0 +1,22 @@
+{
+  "name": "lifeflow",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "mobile": "npm run --workspace=apps/mobile",
+    "api": "npm run --workspace=apps/api",
+    "api:dev": "npm run dev --workspace=apps/api",
+    "api:build": "npm run build --workspace=apps/api",
+    "lint": "npm run lint --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "clean": "rm -rf node_modules apps/*/node_modules packages/*/node_modules"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
