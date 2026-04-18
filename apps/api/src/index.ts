@@ -7,6 +7,8 @@ import { healthRouter } from './routes/health';
 import { userRouter } from './routes/users';
 import { taskRouter } from './routes/tasks';
 import { eventRouter } from './routes/events';
+import { moodRouter } from './routes/mood';
+import { habitRouter } from './routes/habits';
 import { errorHandler } from './middleware/errorHandler';
 
 const app = express();
@@ -23,6 +25,8 @@ app.use('/api/health', healthRouter);
 app.use('/api/users', userRouter);
 app.use('/api/tasks', taskRouter);
 app.use('/api/events', eventRouter);
+app.use('/api/mood', moodRouter);
+app.use('/api/habits', habitRouter);
 
 // Error handler (must be last)
 app.use(errorHandler);

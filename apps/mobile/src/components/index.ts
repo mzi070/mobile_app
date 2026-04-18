@@ -7,5 +7,9 @@ export { TaskItem, AnimatedTaskItem } from './TaskItem';
 export { FilterTabs } from './FilterTabs';
 export { TaskFormSheet } from './TaskFormSheet';
 export { EventFormSheet } from './EventFormSheet';
+export { MoodLogSheet } from './MoodLogSheet';
+export { HabitCard } from './HabitCard';
+export { HabitFormSheet } from './HabitFormSheet';
 export type { FilterOption } from './FilterTabs';
+
 
