@@ -64,6 +64,9 @@ export const lightTheme = {
     textTertiary: palette.gray400,
     textInverse: palette.white,
 
+    text: palette.gray900,
+    textMuted: palette.gray400,
+
     tabBar: palette.white,
     tabBarBorder: palette.gray200,
     tabActive: palette.indigo500,
@@ -146,6 +149,9 @@ export const darkTheme: typeof lightTheme = {
     textSecondary: palette.gray400,
     textTertiary: palette.gray500,
     textInverse: palette.gray900,
+
+    text: palette.gray50,
+    textMuted: palette.gray500,
 
     tabBar: palette.gray900,
     tabBarBorder: palette.gray700,
