@@ -1,4 +1,5 @@
 import 'dotenv/config';
+import * as Sentry from '@sentry/node';
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -11,6 +12,14 @@ import { moodRouter } from './routes/mood';
 import { habitRouter } from './routes/habits';
 import { chatRouter } from './routes/chat';
 import { errorHandler } from './middleware/errorHandler';
+
+// ─── Sentry (initialise before any other code) ────────────────────────────────
+Sentry.init({
+  dsn: process.env.SENTRY_DSN ?? '',
+  enabled: !!process.env.SENTRY_DSN,
+  environment: process.env.NODE_ENV ?? 'development',
+  tracesSampleRate: 0.2,
+});
 
 const app = express();
 const port = process.env.PORT || 3000;

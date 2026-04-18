@@ -10,6 +10,7 @@ export { EventFormSheet } from './EventFormSheet';
 export { MoodLogSheet } from './MoodLogSheet';
 export { HabitCard } from './HabitCard';
 export { HabitFormSheet } from './HabitFormSheet';
+export { ErrorBoundary } from './ErrorBoundary';
 export type { FilterOption } from './FilterTabs';
 
 

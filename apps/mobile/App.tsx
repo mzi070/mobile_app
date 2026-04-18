@@ -8,6 +8,11 @@ import type { Notification } from '@notifee/react-native';
 import { AppNavigator, navigationRef } from './src/navigation';
 import { useAppStore } from './src/store';
 import { notificationService } from './src/services/notificationService';
+import { initSentry } from './src/services/sentryService';
+import { ErrorBoundary } from './src/components';
+
+// Initialise Sentry as early as possible (before any component renders)
+initSentry();
 
 // ─── Notification deep-link helper ───────────────────────────────────────────
 function routeForNotification(notification: Notification | undefined): string | null {
@@ -67,17 +72,19 @@ function App() {
   }, [notificationsEnabled]);
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <SafeAreaProvider>
-        <BottomSheetModalProvider>
-          <StatusBar
-            barStyle={isDark ? 'light-content' : 'dark-content'}
-            backgroundColor={theme.colors.background}
-          />
-          <AppNavigator />
-        </BottomSheetModalProvider>
-      </SafeAreaProvider>
-    </GestureHandlerRootView>
+    <ErrorBoundary>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <SafeAreaProvider>
+          <BottomSheetModalProvider>
+            <StatusBar
+              barStyle={isDark ? 'light-content' : 'dark-content'}
+              backgroundColor={theme.colors.background}
+            />
+            <AppNavigator />
+          </BottomSheetModalProvider>
+        </SafeAreaProvider>
+      </GestureHandlerRootView>
+    </ErrorBoundary>
   );
 }
 
