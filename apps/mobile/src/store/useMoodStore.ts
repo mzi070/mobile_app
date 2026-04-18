@@ -1,4 +1,6 @@
 import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { moodService, MoodEntry, CreateMoodInput, MoodScore } from '../services/moodService';
 
 // Returns YYYY-MM-DD
@@ -29,7 +31,9 @@ interface MoodState {
   moodHistory: () => Array<{ date: string; mood: MoodScore; energy: MoodScore }>;
 }
 
-export const useMoodStore = create<MoodState>((set, get) => ({
+export const useMoodStore = create<MoodState>()(
+  persist(
+    (set, get) => ({
   entries: [],
   todayEntry: null,
   isLoading: false,
@@ -93,4 +97,11 @@ export const useMoodStore = create<MoodState>((set, get) => ({
         energy: e.energy as MoodScore,
       }))
       .reverse(),
-}));
+}),
+{
+  name: 'lifeflow-mood',
+  storage: createJSONStorage(() => AsyncStorage),
+  partialize: (state) => ({ entries: state.entries, todayEntry: state.todayEntry }),
+},
+  ),
+);

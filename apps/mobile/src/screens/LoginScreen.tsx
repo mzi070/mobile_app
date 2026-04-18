@@ -1,17 +1,51 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, Alert, ActivityIndicator } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppStore } from '../store';
 import { Button } from '../components';
+import { authService } from '../services/authService';
+import { notificationService } from '../services/notificationService';
 import type { Theme } from '../theme';
 
 export function LoginScreen() {
   const { theme, setAuth } = useAppStore();
   const insets = useSafeAreaInsets();
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleLogin = () => {
-    // TODO: Replace with actual Auth0 login flow
-    // For now, use a demo user to test navigation
+  const handleAuth0Login = async () => {
+    setIsLoading(true);
+    try {
+      const { credentials, user } = await authService.login();
+      await authService.saveCredentials(credentials);
+      setAuth(credentials.accessToken, {
+        id: user.sub,
+        name: user.name,
+        email: user.email,
+        avatarUrl: user.picture,
+      });
+      // Set up notifications after login
+      await notificationService.setup();
+      const granted = await notificationService.requestPermission();
+      if (granted) {
+        await notificationService.scheduleDailyHabitReminder(20, 0);
+        await notificationService.scheduleDailyMoodCheckIn(9, 0);
+      }
+    } catch (err: unknown) {
+      // User cancelled login (error.code === 'a0.session.user_cancelled') — ignore silently
+      const code = (err as { code?: string })?.code;
+      if (code !== 'a0.session.user_cancelled') {
+        Alert.alert(
+          'Sign In Failed',
+          err instanceof Error ? err.message : 'Something went wrong. Please try again.',
+        );
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Demo shortcut for development (no Auth0 credentials needed)
+  const handleDemoLogin = () => {
     setAuth('demo-token', {
       id: 'demo-user',
       name: 'Alex Chen',
@@ -74,27 +108,26 @@ export function LoginScreen() {
 
       {/* Login buttons */}
       <View style={styles.bottomSection}>
-        <Button
-          title="Continue with Google"
-          onPress={handleLogin}
-          variant="primary"
-          size="lg"
-          style={{ width: '100%', marginBottom: 12 }}
-        />
-        <Button
-          title="Continue with Apple"
-          onPress={handleLogin}
-          variant="outline"
-          size="lg"
-          style={{ width: '100%', marginBottom: 12 }}
-        />
-        <Button
-          title="Sign in with Email"
-          onPress={handleLogin}
-          variant="ghost"
-          size="md"
-          style={{ width: '100%' }}
-        />
+        {isLoading ? (
+          <ActivityIndicator size="large" color={theme.colors.primary} style={{ marginBottom: 24 }} />
+        ) : (
+          <>
+            <Button
+              title="Continue with Auth0"
+              onPress={handleAuth0Login}
+              variant="primary"
+              size="lg"
+              style={{ width: '100%', marginBottom: 12 }}
+            />
+            <Button
+              title="Try Demo (No Account Needed)"
+              onPress={handleDemoLogin}
+              variant="outline"
+              size="lg"
+              style={{ width: '100%', marginBottom: 12 }}
+            />
+          </>
+        )}
 
         <Text
           style={[

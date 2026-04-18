@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import {
   View,
   Text,
@@ -6,14 +6,56 @@ import {
   ScrollView,
   TouchableOpacity,
   Switch,
+  Alert,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppStore } from '../store';
 import { Header } from '../components';
+import { authService } from '../services/authService';
+import { notificationService } from '../services/notificationService';
 
 export function ProfileScreen() {
-  const { theme, user, themeMode, setThemeMode, clearAuth } = useAppStore();
+  const { theme, user, themeMode, setThemeMode, clearAuth, notificationsEnabled, setNotificationsEnabled } = useAppStore();
   const insets = useSafeAreaInsets();
+
+  const handleSignOut = useCallback(() => {
+    Alert.alert('Sign Out', 'Are you sure you want to sign out?', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Sign Out',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            await authService.logout();
+          } catch {
+            // clearSession may fail if no web session exists (demo login); continue anyway
+          }
+          await authService.clearCredentials();
+          await notificationService.cancelAll();
+          clearAuth();
+        },
+      },
+    ]);
+  }, [clearAuth]);
+
+  const handleNotificationsToggle = useCallback(
+    async (enabled: boolean) => {
+      setNotificationsEnabled(enabled);
+      if (enabled) {
+        const granted = await notificationService.requestPermission();
+        if (granted) {
+          await notificationService.scheduleDailyHabitReminder(20, 0);
+          await notificationService.scheduleDailyMoodCheckIn(9, 0);
+        } else {
+          // Permission denied — revert toggle
+          setNotificationsEnabled(false);
+        }
+      } else {
+        await notificationService.cancelAll();
+      }
+    },
+    [setNotificationsEnabled],
+  );
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
@@ -117,7 +159,8 @@ export function ProfileScreen() {
               Notifications
             </Text>
             <Switch
-              value={true}
+              value={notificationsEnabled}
+              onValueChange={handleNotificationsToggle}
               trackColor={{
                 false: theme.colors.border,
                 true: theme.colors.primaryLight,
@@ -173,7 +216,7 @@ export function ProfileScreen() {
               styles.signOutButton,
               { borderColor: theme.colors.error, borderRadius: theme.borderRadius.md },
             ]}
-            onPress={clearAuth}
+            onPress={handleSignOut}
             accessibilityLabel="Sign out"
             accessibilityRole="button"
           >

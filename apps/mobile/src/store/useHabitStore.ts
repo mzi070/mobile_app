@@ -1,4 +1,6 @@
 import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { habitService, Habit, CreateHabitInput, UserProgress } from '../services/habitService';
 
 function todayDateString(): string {
@@ -51,7 +53,9 @@ interface HabitState {
   isCompletedToday: (habitId: string) => boolean;
 }
 
-export const useHabitStore = create<HabitState>((set, get) => ({
+export const useHabitStore = create<HabitState>()(
+  persist(
+    (set, get) => ({
   habits: [],
   progress: null,
   isLoading: false,
@@ -162,4 +166,11 @@ export const useHabitStore = create<HabitState>((set, get) => ({
     if (!habit) return false;
     return habit.logs.some((l) => l.date.startsWith(today) && l.completed);
   },
-}));
+}),
+{
+  name: 'lifeflow-habits',
+  storage: createJSONStorage(() => AsyncStorage),
+  partialize: (state) => ({ habits: state.habits, progress: state.progress }),
+},
+  ),
+);
