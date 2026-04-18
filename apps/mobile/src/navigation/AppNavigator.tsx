@@ -8,6 +8,7 @@ import {
   TasksScreen,
   CalendarScreen,
   WellnessScreen,
+  ChatScreen,
   ProfileScreen,
   LoginScreen,
 } from '../screens';
@@ -17,6 +18,7 @@ export type MainTabParamList = {
   Tasks: undefined;
   Calendar: undefined;
   Wellness: undefined;
+  Chat: undefined;
   Profile: undefined;
 };
 
@@ -27,6 +29,7 @@ const tabIcons: Record<string, { active: string; inactive: string }> = {
   Tasks: { active: '📋', inactive: '📝' },
   Calendar: { active: '📅', inactive: '🗓️' },
   Wellness: { active: '🧘', inactive: '🧘' },
+  Chat: { active: '💬', inactive: '💭' },
   Profile: { active: '👤', inactive: '👤' },
 };
 
@@ -76,6 +79,7 @@ export function AppNavigator() {
         <Tab.Screen name="Tasks" component={TasksScreen} />
         <Tab.Screen name="Calendar" component={CalendarScreen} />
         <Tab.Screen name="Wellness" component={WellnessScreen} />
+        <Tab.Screen name="Chat" component={ChatScreen} />
         <Tab.Screen name="Profile" component={ProfileScreen} />
       </Tab.Navigator>
     </NavigationContainer>
