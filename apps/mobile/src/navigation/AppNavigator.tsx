@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, createNavigationContainerRef } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Text } from 'react-native';
 import { useAppStore } from '../store';
@@ -11,7 +11,10 @@ import {
   ChatScreen,
   ProfileScreen,
   LoginScreen,
+  OnboardingScreen,
 } from '../screens';
+
+export const navigationRef = createNavigationContainerRef<MainTabParamList>();
 
 export type MainTabParamList = {
   Home: undefined;
@@ -43,18 +46,26 @@ function TabIcon({ routeName, focused }: { routeName: string; focused: boolean }
 }
 
 export function AppNavigator() {
-  const { isAuthenticated, theme } = useAppStore();
+  const { isAuthenticated, hasCompletedOnboarding, theme } = useAppStore();
 
   if (!isAuthenticated) {
     return (
-      <NavigationContainer>
+      <NavigationContainer ref={navigationRef}>
         <LoginScreen />
       </NavigationContainer>
     );
   }
 
+  if (!hasCompletedOnboarding) {
+    return (
+      <NavigationContainer ref={navigationRef}>
+        <OnboardingScreen />
+      </NavigationContainer>
+    );
+  }
+
   return (
-    <NavigationContainer>
+    <NavigationContainer ref={navigationRef}>
       <Tab.Navigator
         screenOptions={({ route }) => ({
           headerShown: false,

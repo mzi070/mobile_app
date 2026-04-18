@@ -5,3 +5,4 @@ export { WellnessScreen } from './WellnessScreen';
 export { ChatScreen } from './ChatScreen';
 export { ProfileScreen } from './ProfileScreen';
 export { LoginScreen } from './LoginScreen';
+export { OnboardingScreen } from './OnboardingScreen';
